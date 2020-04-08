@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;"> -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <link rel="stylesheet" type="text/css" ß href="css/index.css">
+    <title>Hubridy Share</title>
+    <!-- MDB icon -->
+    <link rel="icon" href="img/mdb-favicon.ico" type="image/x-icon">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+    <!-- Google Fonts Roboto -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!-- Material Design Bootstrap -->
+    <link rel="stylesheet" href="css/mdb.min.css">
+    <!-- Your custom styles (optional) -->
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+</head>
+
+<body style="background-color: #F6F6F6;">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark primary-color">
+        <span class="navbar-brand">Hubridy Share</span>
+    </nav>
+    <!-- Start your project here-->
+    <div id="_content" class="container-fluid my-5" style="padding-top: 40px; min-height: calc(100vh-40px);">
+        <div id="splash" style="position: fixed; top: 0; right: 0; left: 0; bottom: 0; background-color: #FFF"
+            class="w-100 h-100 flex-center d-flex flex-column">
+            <img src="img/icon.png" class="img-fluid">
+            <div class="container">
+                <button onclick="order(true);" class="btn btn-block btn-primary">Make An Order</button>
+            </div>
+        </div>
+
+        <div id="content" class="d-none">
+            <form id="form">
+                <input type="hidden" name="item" id="item" />
+                <div class="card">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title"><a>Identity Details</a></h4> -->
+                        <div class="md-form">
+                            <input type="text" name="full_name" id="full_name" class="form-control">
+                            <label for="full_name">Full Name</label>
+                        </div>
+                        <div class="md-form">
+                            <input type="number" name="contact" id="contact" class="form-control">
+                            <label for="contact">Mobile Number</label>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="card">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title"><a>Residence</a></h4> -->
+                        <div class="md-form">
+                            <select style="width: 100%;" name="residence" class="mdb-select md-form">
+                                <option value="0" disabled selected>Choose your Residence</option>
+                                <option value="Pine Hotel">Pine Hotel</option>
+                                <option value="D Belle">D Belle</option>
+                                <option value="Titanium">Titanium</option>
+                                <option value="Sapphire">Sapphire</option>
+                                <option value="Citadine">Citadine</option>
+                                <option value="Panovel">Panovel</option>
+                                <option value="Deloft">Deloft</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="card">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title"><a>Unit</a></h4> -->
+                        <div class="md-form">
+                            <input type="text" name="unit" id="unit" class="form-control">
+                            <label for="unit">Your Unit Number</label>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-0"><a>Item(s)</a></h4>
+                        <span style="font-size: 0.7em;">*Cash on Delivery</span>
+                        <br />
+                        <br />
+                        <button type="button" class="btn btn-block btn-outline-primary waves-effect" data-toggle="modal"
+                            data-target="#itemModal">Add</button>
+                        <br />
+                        <div id='items'>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <br />
+            <button type="button" onclick="submit();" class="btn btn-primary btn-block waves-effect">Place
+                Order</button>
+        </div>
+
+        <div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="itemModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add an item</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="md-form">
+                            <textarea id="itemAdd" class="md-textarea form-control" rows="3"></textarea>
+                            <label for="itemAdd">Item Description</label>
+                        </div>
+                        <div class="d-flex flex-row flex-center">
+                            <div class="md-form flex-1">
+                                <input id="itemQuantityAdd" class="form-control" type="number" value="1"></input>
+                                <label for="itemQuantityAdd">Item Quantity</label>
+                            </div>
+                            <div>
+                                <select style="width: 100%;" id="unit" class="mdb-select md-form">
+                                    <option value="unit" selected>Unit</option>
+                                    <option value="kg">KG</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="button" onclick="addItem();" class="btn btn-primary">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading"
+        style="position: fixed; top: 0; right: 0; left: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5)"
+        class="w-100 h-100 flex-center d-none flex-column">
+        <h2 class="text-white">Please Wait</h2>
+        <h4 class="text-white">Sending your order</h4>
+    </div>
+    <!-- End your project here-->
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="js/mdb.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <!-- Your custom scripts (optional) -->
+    <script type="text/javascript"></script>
+    <script>
+        $(document).ready(function () {
+
+        });
+
+        function order(show) {
+            if (show) {
+                $('#splash').addClass('d-none');
+                $('#splash').removeClass('d-flex');
+
+                $('#content').addClass('d-block');
+                $('#content').removeClass('d-none');
+            } else {
+                $('#splash').addClass('d-flex');
+                $('#splash').removeClass('d-none');
+
+                $('#content').addClass('d-none');
+                $('#content').removeClass('d-block');
+            }
+        }
+
+        function loading(show) {
+            if (show) {
+                $('#loading').addClass('d-flex');
+                $('#loading').removeClass('d-none');
+            } else {
+                $('#loading').addClass('d-none');
+                $('#loading').removeClass('d-flex');
+            }
+        }
+
+    </script>
+
+
+
+    <script>
+        let url = "https://script.google.com/macros/s/AKfycbz3BW3fn0oWNDTblt9wvIQEMZ-vf3O6rpSbC_bwMlxcW66D_KQ/exec";
+        let itemIndex = 0;
+        let itemList = [];
+        $(document).ready(function () {
+            $('.mdb-select').select2();
+
+            $('#itemQuantityAdd').on('change', function () {
+                if ($(this).val() == "" || $(this).val() < 1) {
+                    $(this).val(1);
+                }
+            })
+        });
+
+        function loading(show) {
+            if (show) {
+                $('#loading').addClass('d-flex');
+                $('#loading').removeClass('d-none');
+            } else {
+                $('#loading').addClass('d-none');
+                $('#loading').removeClass('d-flex');
+            }
+        }
+
+        function addItem() {
+            $('#itemModal').modal('hide');
+            let item = $('#itemAdd').val();
+            let itemQuantity = $('#itemQuantityAdd').val() + " " + $("#unit").select2('val');
+            $('#itemAdd').val('');
+            $('#itemQuantityAdd').val('1');
+            itemList[itemIndex] = {
+                item: item,
+                quantity: itemQuantity
+            }
+            // itemList[itemIndex]['item'] = item;
+            // itemList[itemIndex]['quantity'] = itemQuantity;
+            console.log(JSON.stringify(itemList));
+
+            let html = `<div id="item_${itemIndex}" class="card my-1">
+                        <div class="card-body flex-row flex-center d-flex">
+                            <h6 style="mb-0; flex: 1">
+                                ${item}
+                                <br/>
+                                <span style="font-size: 0.7em;">Quantity: ${itemQuantity}</span>
+                            <h6>
+                            <button onclick="remove(${itemIndex});" type="button" class="btn btn-danger btn-link">X</button>
+                        </div>
+                        
+                    </div>`;
+
+            itemIndex++;
+            $('#item').val(JSON.stringify(itemList));
+            $('#items').append(html);
+        }
+
+        function remove(id) {
+            $(`#item_${id}`).remove();
+            // itemList[id].delete();
+            delete itemList[id];
+            console.log(JSON.stringify(itemList));
+            $('#item').val(JSON.stringify(itemList));
+        }
+
+        function submit() {
+            console.log($('#form').serialize());
+
+            if ($('#full_name').val() == '') {
+                Swal.fire(
+                    'Oops!',
+                    'Make sure you filled your name!',
+                    'error'
+                )
+                return false;
+            }
+
+            if ($('#residence').val() == 0) {
+                Swal.fire(
+                    'Oops!',
+                    'Make sure you chose your residence!',
+                    'error'
+                )
+                return false;
+            }
+
+            if ($('#unit').val() == '') {
+                Swal.fire(
+                    'Oops!',
+                    'Make sure you filled your unit number!',
+                    'error'
+                )
+                return false;
+            }
+
+            if ($('#item').val() == '') {
+                Swal.fire(
+                    'Oops!',
+                    'Make sure you add at least 1 item!',
+                    'error'
+                )
+                return false;
+            }
+
+            loading(true);
+            var jqxhr = $.ajax({
+                url: url,
+                method: "GET",
+                dataType: "json",
+                data: $('#form').serialize()
+            }).done(function () {
+                console.log('done');
+                // order(false);
+                loading(false);
+                // clearAll();
+                // Swal.fire(
+                //     'Done!',
+                //     'You have submitted your order!',
+                //     'success'
+                // )
+                Swal.fire({
+                    title: "Success!",
+                    text: "You have submitted your order!",
+                    type: "success",
+                }).then(function () {
+                    window.location.reload();
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
