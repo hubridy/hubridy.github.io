@@ -1,14 +1,50 @@
 [
   {
-    "name": "Eggs",
-    "price": "10"
+    "name": "My Happy Eggs 10s",
+    "price": "4.80"
   },
   {
-    "name": "Meat",
-    "price": "10"
+    "name": "Maggi Mee Chicken(5 pkts)",
+    "price": "4.50"
   },
   {
-    "name": "Apples",
-    "price": "10"
+    "name": "Biscuits Jacob Cream 700G",
+    "price": "14.00"
+  },
+  {
+    "name": "Pringles Snacks (107g)",
+    "price": "5.00"
+  },
+  {
+    "name": "Rice Butterfly Thai Flagrant Rice 5kg",
+    "price": "27.00"
+  },
+  {
+    "name": "Milo Activgo 3 in 1",
+    "price": "14.50"
+  },
+  {
+    "name": "100 plus 325ml",
+    "price": "2.00"
+  },
+  {
+    "name": "Ibumie Mee Goreng (70gx5)",
+    "price": "3.50"
+  },
+  {
+    "name": "Ayamas Chicken Breakfast (340g)",
+    "price": "7.20"
+  },
+  {
+    "name": "Dutch Lady Milk 200ml(6 pkts)",
+    "price": "8.20"
+  },
+  {
+    "name": "Maggi Mee Curry (5 pkts)",
+    "price": "4.50"
+  },
+  {
+    "name": "Coca Cola 325ml",
+    "price": "2.00"
   }
 ]
