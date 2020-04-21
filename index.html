@@ -18,7 +18,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
-    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" ß href="css/index.css">
     <title>Hubridy Share</title>
     <!-- MDB icon -->
     <link rel="icon" href="img/icon.png" type="image/x-icon">
@@ -44,7 +44,7 @@
     <div id="_content" class="container-fluid my-5" style="padding-top: 40px; min-height: calc(100vh-40px);">
         <div id="splash" style="position: fixed; top: 0; right: 0; left: 0; bottom: 0; background-color: #FFF"
             class="w-100 h-100 flex-center d-flex flex-column">
-            <img src="img/icon.png" style="max-width: 340px;" class="img-fluid">
+            <img src="img/icon.png" class="img-fluid" style="max-width: 300px;">
             <div class="container">
                 <button onclick="order(true);" class="btn btn-block btn-primary">Make An Order</button>
             </div>
@@ -53,12 +53,17 @@
         <div id="content" class="d-none">
             <form id="form">
                 <input type="hidden" name="item" id="item" />
+                <input type="hidden" name="fixed_item" id="fixed_item" />
                 <div class="card">
                     <div class="card-body">
                         <!-- <h4 class="card-title"><a>Identity Details</a></h4> -->
                         <div class="md-form">
                             <input type="text" name="full_name" id="full_name" class="form-control">
                             <label for="full_name">Full Name</label>
+                        </div>
+                        <div class="md-form">
+                            <input type="text" name="email" id="email" class="form-control">
+                            <label for="email">Email</label>
                         </div>
                         <div class="md-form">
                             <input type="number" name="contact" id="contact" class="form-control">
@@ -101,9 +106,13 @@
                         <span style="font-size: 0.7em;">*Cash on Delivery</span>
                         <br />
                         <br />
-                        <button type="button" class="btn btn-block btn-outline-primary waves-effect" data-toggle="modal"
+                        <button type="button" id="addItemModalBtn"
+                            class="btn btn-block btn-outline-primary waves-effect" data-toggle="modal"
                             data-target="#itemModal">Add</button>
                         <br />
+                        <div id="fixed_items">
+
+                        </div>
                         <div id='items'>
 
                         </div>
@@ -111,7 +120,7 @@
                 </div>
             </form>
             <br />
-            <button type="button" onclick="submit();" class="btn btn-primary btn-block waves-effect">Place
+            <button type="button" onclick="validate();" class="btn btn-primary btn-block waves-effect">Place
                 Order</button>
         </div>
 
@@ -136,13 +145,19 @@
                                 <label for="itemQuantityAdd">Item Quantity</label>
                             </div>
                             <div>
-                                <select style="width: 100%;" id="unit" class="mdb-select md-form">
+                                <select style="width: 100%;" id="item_unit" class="mdb-select md-form">
                                     <option value="unit" selected>Unit</option>
                                     <option value="kg">KG</option>
                                 </select>
                             </div>
                         </div>
-
+                        <div class="d-flex flex-row flex-center">
+                            <label class="mr-1 mb-0" for="itemAdd">RM</label>
+                            <div class="md-form flex-1">
+                                <input id="itemPrice" class="form-control" type="number" value=""></input>
+                                <label for="itemPrice">Estimated Price</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -211,9 +226,12 @@
 
 
     <script>
-        let url = "https://script.google.com/macros/s/AKfycbz3BW3fn0oWNDTblt9wvIQEMZ-vf3O6rpSbC_bwMlxcW66D_KQ/exec";
+        let url = "https://script.google.com/macros/s/AKfycbxdfVa_RHxhAp0JTrBau5pIFCOqjHtF-HWqs7oP/exec";
         let itemIndex = 0;
+        let removedIndex = [];
         let itemList = [];
+        let fixedItemList = [];
+        let fixedItemCost = []
         $(document).ready(function () {
             $('.mdb-select').select2();
 
@@ -222,7 +240,114 @@
                     $(this).val(1);
                 }
             })
+
+            if (localStorage.getItem('full_name') && localStorage.getItem('full_name') != '') {
+                $("[for=full_name]").addClass('active');
+            }
+            $('#full_name').val(localStorage.getItem('full_name'))
+            $('#full_name').on('input', function () {
+                localStorage.setItem('full_name', $(this).val())
+            })
+
+            if (localStorage.getItem('unit') && localStorage.getItem('unit') != '') {
+                $("[for=unit]").addClass('active');
+            }
+            $('#unit').val(localStorage.getItem('unit'))
+            $('#unit').on('input', function () {
+                localStorage.setItem('unit', $(this).val())
+            })
+
+            if (localStorage.getItem('contact') && localStorage.getItem('contact') != '') {
+                $("[for=contact]").addClass('active');
+            }
+            $('#contact').val(localStorage.getItem('contact'))
+            $('#contact').on('input', function () {
+                localStorage.setItem('contact', $(this).val())
+            })
+
+            if (localStorage.getItem('residence') && localStorage.getItem('residence') != '') {
+                $('.mdb-select').not('#item_unit').val(localStorage.getItem('residence')).trigger('change')
+            }
+            $('.mdb-select').not('#item_unit').on('change', function () {
+                localStorage.setItem('residence', $(this).val())
+            })
+
+            if (localStorage.getItem('email') && localStorage.getItem('email') != '') {
+                $("[for=email]").addClass('active');
+            }
+            $('#email').val(localStorage.getItem('email'))
+            $('#email').on('input', function () {
+                localStorage.setItem('email', $(this).val())
+            })
+
+            var jqxhr = $.ajax({
+                url: "http://share.hubridycompany.com/items.json",
+                method: "GET",
+                dataType: "json",
+                data: $('#form').serialize()
+            }).done(function (res) {
+                console.log(res);
+                let i = 0;
+                let html = '';
+                res.map((item) => {
+                    html += `<div id="fixed_item_${i}" class="card my-1">
+                        <div class="card-body flex-row flex-center d-flex">
+                            <h6 style="mb-0; flex: 1">
+                                ${item.name}
+                                <br/>
+                                <span style="font-size: 0.7em;">Price: RM <span id="fixed_item_price_${i}">0</span></span>             
+                            <h6>
+                            <div>
+                                <button style="padding: 0.5rem;" onclick="addFixedItem(${i})" type="button" class="btn btn-primary btn-link">+</button>
+                                <span id="fixed_item_quantity_${i}">0</span>
+                                <button style="padding: 0.5rem;" onclick="removeFixedItem(${i})" type="button" class="btn btn-danger btn-link">-</button>
+                            </div>
+                        </div>
+                        
+                    </div>`;
+                    fixedItemList[i] = {
+                        name: item.name,
+                        quantity: 0,
+                        price: 0
+                    }
+                    fixedItemCost[i] = item.price
+                    i++;
+                })
+
+                $('#fixed_items').html(html);
+            });
         });
+
+        function addFixedItem(id) {
+            let cost = fixedItemCost[id];
+            // console.log(cost);
+            let quantity = fixedItemList[id]['quantity'] + 1;
+            // console.log(quantity);
+            fixedItemList[id]['quantity'] = quantity;
+            let price = cost * quantity;
+            // console.log(price);
+            fixedItemList[id]['price'] = price;
+            $('#fixed_item_price_' + id).html(price);
+            $('#fixed_item_quantity_' + id).html(quantity);
+            // console.log(fixedItemList)
+            $('#fixed_item').val(JSON.stringify(fixedItemList));
+        }
+
+        function removeFixedItem(id) {
+            let cost = fixedItemCost[id];
+            // console.log(cost);
+            if (fixedItemList[id]['quantity'] > 0) {
+                let quantity = fixedItemList[id]['quantity'] - 1;
+                // console.log(quantity);
+                fixedItemList[id]['quantity'] = quantity;
+                let price = cost * quantity;
+                // console.log(price);
+                fixedItemList[id]['price'] = price;
+                $('#fixed_item_price_' + id).html(price);
+                $('#fixed_item_quantity_' + id).html(quantity);
+                $('#fixed_item').val(JSON.stringify(fixedItemList));
+            }
+        }
 
         function loading(show) {
             if (show) {
@@ -237,13 +362,24 @@
         function addItem() {
             $('#itemModal').modal('hide');
             let item = $('#itemAdd').val();
-            let itemQuantity = $('#itemQuantityAdd').val() + " " + $("#unit").select2('val');
+            let itemQuantity = $('#itemQuantityAdd').val() + " " + $("#item_unit").select2('val');
             $('#itemAdd').val('');
             $('#itemQuantityAdd').val('1');
-            itemList[itemIndex] = {
-                item: item,
-                quantity: itemQuantity
+            if ($('#itemPrice').val() !== '') {
+                itemList[itemIndex] = {
+                    item: item,
+                    quantity: itemQuantity,
+                    price: "RM " + $('#itemPrice').val()
+                }
+            } else {
+                itemList[itemIndex] = {
+                    item: item,
+                    quantity: itemQuantity,
+                    price: "RM -"
+                }
             }
+
+            $('#itemPrice').val('');
             // itemList[itemIndex]['item'] = item;
             // itemList[itemIndex]['quantity'] = itemQuantity;
             console.log(JSON.stringify(itemList));
@@ -263,23 +399,51 @@
             itemIndex++;
             $('#item').val(JSON.stringify(itemList));
             $('#items').append(html);
+
+            if (itemList.length >= 5) {
+                $('#addItemModalBtn').hide();
+            } else {
+                $('#addItemModalBtn').show();
+            }
         }
 
         function remove(id) {
             $(`#item_${id}`).remove();
             // itemList[id].delete();
-            delete itemList[id];
+            itemList.splice(id, 1);
+            // delete itemList[id];
             console.log(JSON.stringify(itemList));
             $('#item').val(JSON.stringify(itemList));
+            let newItemList = []
+            let newIndex = 0;
+            for (i in itemList) {
+                newItemList[newIndex] = itemList[i];
+                newIndex++;
+            }
+            itemList = newItemList;
+            itemIndex = newIndex;
+
+            if (itemList.length >= 5) {
+                $('#addItemModalBtn').hide();
+            } else {
+                $('#addItemModalBtn').show();
+            }
         }
 
-        function submit() {
-            console.log($('#form').serialize());
-
+        function validate() {
             if ($('#full_name').val() == '') {
                 Swal.fire(
                     'Oops!',
                     'Make sure you filled your name!',
+                    'error'
+                )
+                return false;
+            }
+
+            if ($('#email').val() == '') {
+                Swal.fire(
+                    'Oops!',
+                    'Make sure you filled your email!',
                     'error'
                 )
                 return false;
@@ -303,14 +467,22 @@
                 return false;
             }
 
-            if ($('#item').val() == '') {
-                Swal.fire(
-                    'Oops!',
-                    'Make sure you add at least 1 item!',
-                    'error'
-                )
-                return false;
-            }
+            Swal.fire({
+                title: "Notice",
+                icon: 'info',
+                footer: "You are required to pay RM50 security deposit in advance. Balance will be refunded upon delivery, insufficient amount will be collected upon delivery.",
+                type: "warning",
+                html:
+                    '<b>Hubridy Company</b> <br/>' +
+                    'Bank Account No: 511234132337 <br/>' +
+                    'Bank: Maybank',
+            }).then(function () {
+                submit();
+            });
+        }
+
+        function submit() {
+            console.log($('#form').serialize());
 
             loading(true);
             var jqxhr = $.ajax({
@@ -330,8 +502,11 @@
                 // )
                 Swal.fire({
                     title: "Success!",
-                    text: "You have submitted your order!",
-                    type: "success",
+                    icon: 'success',
+                    html:
+                    '<h4 class="text-center"><b>Your order has been received.</b></h4>' +
+                    'Please proceed to send an attachement of your payment receipt to: <br/>' +
+                    '<a class="btn btn-primary" href="mailto:hubridyshare@gmail.com?subject=Hubridy Share Deposit Receipt ('+$('#full_name').val()+')">hubridyshare@gmail.com</a>',
                 }).then(function () {
                     window.location.reload();
                 });
