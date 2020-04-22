@@ -78,6 +78,7 @@
                         <div class="md-form">
                             <select style="width: 100%;" name="residence" class="mdb-select md-form">
                                 <option value="0" disabled selected>Choose your Residence</option>
+                                <option value="On Campus">On Campus</option>
                                 <option value="Pine Hotel">Pine Hotel</option>
                                 <option value="D Belle">D Belle</option>
                                 <option value="Titanium">Titanium</option>
@@ -110,6 +111,9 @@
                             class="btn btn-block btn-outline-primary waves-effect" data-toggle="modal"
                             data-target="#itemModal">Add</button>
                         <br />
+                        <p class="text-center" style="font-size: 0.7rem;">We can help getting 3 other items for you.
+                            Please let us know the approximate price of the items. We will confirm with you before
+                            purchasing them.</p>
                         <div id="fixed_items">
                             Loading...
                         </div>
@@ -288,31 +292,31 @@
             }).done(function (res) {
                 console.log(res);
                 let html = '';
-                for(var i=1; i<res.data.length; i++){
-                    html += `<div id="fixed_item_${i-1}" class="card my-1">
+                for (var i = 1; i < res.data.length; i++) {
+                    html += `<div id="fixed_item_${i - 1}" class="card my-1">
                         <div class="card-body flex-row flex-center d-flex">
                             <h6 style="mb-0; flex: 1">
                                 ${res.data[i][0]}
                                 <br/>
-                                <span style="font-size: 0.7em;">Price: RM <span id="fixed_item_price_${i-1}">0.00</span></span>             
+                                <span style="font-size: 0.7em;">Price: RM <span id="fixed_item_price_${i - 1}">0.00</span></span>             
                             <h6>
                             <div>
-                                <button style="padding: 0.5rem;" onclick="addFixedItem(${i-1})" type="button" class="btn btn-primary btn-link">+</button>
-                                <span id="fixed_item_quantity_${i-1}">0</span>
-                                <button style="padding: 0.5rem;" onclick="removeFixedItem(${i-1})" type="button" class="btn btn-danger btn-link">-</button>
+                                <button style="padding: 0.5rem;" onclick="addFixedItem(${i - 1})" type="button" class="btn btn-primary btn-link">+</button>
+                                <span id="fixed_item_quantity_${i - 1}">0</span>
+                                <button style="padding: 0.5rem;" onclick="removeFixedItem(${i - 1})" type="button" class="btn btn-danger btn-link">-</button>
                             </div>
                         </div>
                         
                     </div>`;
-                    fixedItemList[i-1] = {
+                    fixedItemList[i - 1] = {
                         name: res.data[i][0],
                         quantity: 0,
                         price: 0
                     }
-                    fixedItemCost[i-1] = res.data[i][1].toFixed(2);
+                    fixedItemCost[i - 1] = res.data[i][1].toFixed(2);
                 }
                 // res.data.map((item) => {
-                    
+
                 // })
 
                 $('#fixed_items').html(html);
@@ -403,7 +407,7 @@
             $('#item').val(JSON.stringify(itemList));
             $('#items').append(html);
 
-            if (itemList.length >= 5) {
+            if (itemList.length >= 3) {
                 $('#addItemModalBtn').hide();
             } else {
                 $('#addItemModalBtn').show();
@@ -473,12 +477,11 @@
             Swal.fire({
                 title: "Notice",
                 icon: 'info',
-                footer: "You are required to pay RM50 security deposit in advance. Balance will be refunded upon delivery, insufficient amount will be collected upon delivery.",
                 type: "warning",
                 html:
-                    '<b>Hubridy Company</b> <br/>' +
-                    'Bank Account No: 511234132337 <br/>' +
-                    'Bank: Maybank',
+                    `<p style="font-size: 0.85rem;">Thank you. We will WhatsApp you shortly to confirm your order with payment instruction.</p> 
+                    <p style="font-size: 0.85rem;">Due to the MCO, we try to minimize cash handling. Therefore, once your order is confirmed, we will request for pre payment for the items.</p> 
+                    <p style="font-size: 0.85rem;">We will refund the balance once items are purchased.</p>`
             }).then(function () {
                 submit();
             });
@@ -506,10 +509,7 @@
                 Swal.fire({
                     title: "Success!",
                     icon: 'success',
-                    html:
-                    '<h4 class="text-center"><b>Your order has been received.</b></h4>' +
-                    'Please proceed to send an attachement of your payment receipt to: <br/>' +
-                    '<a class="btn btn-primary" href="mailto:hubridyshare@gmail.com?subject=Hubridy Share Deposit Receipt ('+$('#full_name').val()+')">hubridyshare@gmail.com</a>',
+                    html: '<h4 class="text-center"><b>Your order has been received.</b></h4>'
                 }).then(function () {
                     window.location.reload();
                 });
